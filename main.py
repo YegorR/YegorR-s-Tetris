@@ -6,11 +6,14 @@ class Game:
     def __init__(self):
         self._display_surf = None
         self._running = True
+        self._background = None
 
     def init(self):
         pygame.init()
         self._display_surf = pygame.display.set_mode((300, 400))
         self._running = True
+        self._background = pygame.image.load("img/background").convert()
+
 
     def event(self):
         for event in pygame.event.get():
@@ -23,7 +26,8 @@ class Game:
         pass
 
     def render(self):
-        pass
+        self._display_surf.blit(self._background, (0, 0))
+        pygame.display.update()
 
     def destroy(self):
         pygame.quit()
@@ -39,5 +43,4 @@ class Game:
 
 if __name__ == "__main__":
     game = Game()
-    game.init()
     game.execute()
