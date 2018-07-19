@@ -1,18 +1,24 @@
 import pygame
 from pygame.locals import *
-
+import constant
+import block
 
 class Game:
     def __init__(self):
         self._display_surf = None
         self._running = True
         self._background = None
+        self.group = None
 
     def init(self):
         pygame.init()
-        self._display_surf = pygame.display.set_mode((300, 400))
+        pygame.display.set_caption(constant.WINDOW_NAME)
+        self._display_surf = pygame.display.set_mode((constant.WINDOW_WIDTH, constant.WINDOW_HEIGHT))
         self._running = True
-        self._background = pygame.image.load("img/background").convert()
+        self._background = pygame.image.load(constant.FILE_BACKGROUND).convert()
+        #--------------------
+        #tblock = block.Block('black')
+        #self.group = pygame.sprite.Group(tblock)
 
 
     def event(self):
@@ -27,6 +33,7 @@ class Game:
 
     def render(self):
         self._display_surf.blit(self._background, (0, 0))
+        self.group.draw(self._display_surf)
         pygame.display.update()
 
     def destroy(self):
