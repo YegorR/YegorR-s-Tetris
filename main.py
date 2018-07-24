@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 import constant
 import block
+import figure
 
 class Game:
     def __init__(self):
@@ -16,10 +17,8 @@ class Game:
         self._display_surf = pygame.display.set_mode((constant.WINDOW_WIDTH, constant.WINDOW_HEIGHT))
         self._running = True
         self._background = pygame.image.load(constant.FILE_BACKGROUND).convert()
-        #--------------------
-        #tblock = block.Block('black')
-        #self.group = pygame.sprite.Group(tblock)
 
+        self.f = figure.Figure('blue', 'T', 1)
 
     def event(self):
         for event in pygame.event.get():
@@ -33,7 +32,8 @@ class Game:
 
     def render(self):
         self._display_surf.blit(self._background, (0, 0))
-        self.group.draw(self._display_surf)
+        #self.group.draw(self._display_surf)
+        self.f.draw(self._display_surf)
         pygame.display.update()
 
     def destroy(self):

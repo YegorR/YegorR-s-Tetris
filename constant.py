@@ -5,3 +5,7 @@ FILE_BACKGROUND = "img/background.png"
 FILE_BLOCK = "img/block.png"
 
 WINDOW_NAME = "YegorR's Tetris"
+
+BLOCK_SIZE = 15
+STARTING_POINT = (50, 50)
+PROMPT_POINT = (220, 50)

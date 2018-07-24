@@ -5,6 +5,7 @@ color_dict = {'red': 0, 'green': 1, 'blue': 2, 'black': 3, 'white': 4}
 
 main_image = None
 
+
 class Block(pygame.sprite.Sprite):
 
     def __init__(self, color):
@@ -30,3 +31,6 @@ class Block(pygame.sprite.Sprite):
         pxarray.replace((0, 0, 0, 0), repl_color)
         self.image = pxarray.make_surface()
         self.rect = self.image.get_rect()
+
+    def update(self, x, y):
+        self.rect.move_ip(x, y)
