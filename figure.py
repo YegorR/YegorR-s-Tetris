@@ -111,3 +111,12 @@ class Figure(pygame.sprite.Group):
         self._blocks = [block.Block(color) for _ in range(4)]
         self.add(*self._blocks)
         self._rerectering(turn, PROMPT_POINT[0], PROMPT_POINT[1])
+
+    def get_figure(self):
+        return self._figure
+
+    def get_turn(self):
+        return self._turn
+
+    def move(self, turn, x, y):
+        self._rerectering(turn, x, y)

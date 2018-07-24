@@ -11,8 +11,7 @@ class Block(pygame.sprite.Sprite):
     def __init__(self, color):
         pygame.sprite.Sprite.__init__(self)
         global main_image
-        if main_image is None:
-            main_image = pygame.image.load(constant.FILE_BLOCK).convert_alpha()
+        main_image = pygame.image.load(constant.FILE_BLOCK).convert_alpha()
         pxarray = pygame.PixelArray(main_image)
 
         if color_dict[color] == color_dict['red']:
@@ -33,4 +32,5 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def update(self, x, y):
-        self.rect.move_ip(x, y)
+        self.rect.x = x
+        self.rect.y = y

@@ -1,15 +1,14 @@
 import pygame
 from pygame.locals import *
 import constant
-import block
-import figure
+import logic
 
 class Game:
     def __init__(self):
         self._display_surf = None
         self._running = True
         self._background = None
-        self.group = None
+        self._logic = None
 
     def init(self):
         pygame.init()
@@ -17,8 +16,8 @@ class Game:
         self._display_surf = pygame.display.set_mode((constant.WINDOW_WIDTH, constant.WINDOW_HEIGHT))
         self._running = True
         self._background = pygame.image.load(constant.FILE_BACKGROUND).convert()
-
-        self.f = figure.Figure('blue', 'T', 1)
+        self._logic = logic.Logic()
+        self._logic.start()
 
     def event(self):
         for event in pygame.event.get():
@@ -32,8 +31,7 @@ class Game:
 
     def render(self):
         self._display_surf.blit(self._background, (0, 0))
-        #self.group.draw(self._display_surf)
-        self.f.draw(self._display_surf)
+        self._logic.render(self._display_surf)
         pygame.display.update()
 
     def destroy(self):
