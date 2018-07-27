@@ -25,6 +25,8 @@ class Game:
                 self._running = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self._running = False
+            if event.type == constant.PERIOD_EVENT:
+                self._logic.period()
 
     def loop(self):
         pass

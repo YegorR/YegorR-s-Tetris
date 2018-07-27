@@ -1,7 +1,8 @@
-from constant import STARTING_POINT, BLOCK_SIZE
 import fallen
 import random
 import figure
+import pygame
+from constant import GAME_PERIOD, PERIOD_EVENT
 
 figures = {'I', 'S', 'Z', 'O', 'L', 'J', 'T'}
 colors = {'red', 'green', 'blue', 'black', 'white'}
@@ -10,10 +11,13 @@ colors = {'red', 'green', 'blue', 'black', 'white'}
 class Logic:
 
     def __init__(self):
-        self._field = [[False for _ in range(15)] for _ in range(30)]
+        self._field = [[False for _ in range(30)] for _ in range(15)]
         self._figure = None
         self._prompt = None
         self._fallen = fallen.Fallen()
+
+        self._period = GAME_PERIOD[0]
+        pygame.time.set_timer(PERIOD_EVENT, self._period)
 
     def start(self):
         self._prompt = self._create_figute()
@@ -28,6 +32,16 @@ class Logic:
             self._prompt.draw(display_surf)
         if self._fallen is not None:
             self._fallen.draw(display_surf)
+
+    def period(self):
+        is_space = True
+        for coord in self._figure.get_coord():
+            if coord[1] == 19 or self._field[coord[0]][coord[1]+1]:
+                is_space = False
+                break
+        if is_space:
+            pos = self._figure.get_main_coord()
+            self._figure.move(self._figure.get_turn(), pos[0], pos[1]+1)
 
 
 

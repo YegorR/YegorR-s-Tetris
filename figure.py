@@ -111,6 +111,8 @@ class Figure(BlockContainer):
         self._blocks = [block.Block(color) for _ in range(4)]
         self.add(*self._blocks)
         self._rerectering(turn, 0, 0, PROMPT_POINT[0], PROMPT_POINT[1])
+        self._a = 0
+        self._b = 0
 
     def get_figure(self):
         return self._figure
@@ -118,5 +120,10 @@ class Figure(BlockContainer):
     def get_turn(self):
         return self._turn
 
+    def get_main_coord(self):
+        return self._a, self._b
+
     def move(self, turn, a, b):
         self._rerectering(turn, a, b)
+        self._a = a
+        self._b = b
