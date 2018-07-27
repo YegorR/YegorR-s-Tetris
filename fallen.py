@@ -1,10 +1,11 @@
 import pygame
 import block
 from constant import BLOCK_SIZE, STARTING_POINT
+from blockContainer import BlockContainer
 
 
-class Fallen(pygame.sprite.Group):
+class Fallen(BlockContainer):
 
     def __init__(self):
-        pygame.sprite.Group.__init__(self)
+        BlockContainer.__init__(self)
         self._blocks = [[None for _ in range(15)] for _ in range(30)]

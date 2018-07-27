@@ -3,14 +3,11 @@ import constant
 
 color_dict = {'red': 0, 'green': 1, 'blue': 2, 'black': 3, 'white': 4}
 
-main_image = None
-
 
 class Block(pygame.sprite.Sprite):
 
     def __init__(self, color):
         pygame.sprite.Sprite.__init__(self)
-        global main_image
         main_image = pygame.image.load(constant.FILE_BLOCK).convert_alpha()
         pxarray = pygame.PixelArray(main_image)
 
@@ -30,7 +27,18 @@ class Block(pygame.sprite.Sprite):
         pxarray.replace((0, 0, 0, 0), repl_color)
         self.image = pxarray.make_surface()
         self.rect = self.image.get_rect()
+        self._a = 0
+        self._b = 0
+        self._start_x = 0
+        self._start_y = 0
 
-    def update(self, x, y):
-        self.rect.x = x
-        self.rect.y = y
+    def update(self, a, b, start_x=constant.STARTING_POINT[0], start_y=constant.STARTING_POINT[1]):
+        self.rect.x = start_x+constant.BLOCK_SIZE*a
+        self.rect.y = start_y+constant.BLOCK_SIZE*b
+        self._a = a
+        self._b = b
+        self._start_x = start_x
+        self._start_y = start_y
+
+    def get_coord(self):
+        return self._a, self._b

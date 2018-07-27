@@ -19,7 +19,7 @@ class Logic:
         self._prompt = self._create_figute()
         self._figure = self._create_figute()
         pos = self._start_position(self._figure.get_figure(), self._figure.get_turn())
-        self._figure.move(self._figure.get_turn(), *self._game_to_real(pos[0], pos[1]))
+        self._figure.move(self._figure.get_turn(), pos[0], pos[1])
 
     def render(self, display_surf):
         if self._figure is not None:
@@ -30,8 +30,6 @@ class Logic:
             self._fallen.draw(display_surf)
 
 
-    def _game_to_real(self, a, b):
-        return STARTING_POINT[0]+BLOCK_SIZE*a, STARTING_POINT[1]+BLOCK_SIZE*b
 
     def _create_figute(self):
         _figure = random.choice(list(figures))
