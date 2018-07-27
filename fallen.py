@@ -8,4 +8,4 @@ class Fallen(BlockContainer):
 
     def __init__(self):
         BlockContainer.__init__(self)
-        self._blocks = [[None for _ in range(15)] for _ in range(30)]
+        self._blocks = [[None for _ in range(30)] for _ in range(15)]

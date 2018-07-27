@@ -20,8 +20,8 @@ class Logic:
         pygame.time.set_timer(PERIOD_EVENT, self._period)
 
     def start(self):
-        self._prompt = self._create_figute()
-        self._figure = self._create_figute()
+        self._prompt = self._create_figure()
+        self._figure = self._create_figure()
         pos = self._start_position(self._figure.get_figure(), self._figure.get_turn())
         self._figure.move(self._figure.get_turn(), pos[0], pos[1])
 
@@ -42,10 +42,19 @@ class Logic:
         if is_space:
             pos = self._figure.get_main_coord()
             self._figure.move(self._figure.get_turn(), pos[0], pos[1]+1)
+        else:
+            for coord in self._figure.get_coord():
+                self._field[coord[0]][coord[1]] = True
+            for block in self._figure.sprites():
+                block.remove(self._figure)
+                block.add(self._fallen)
+            self._figure = self._prompt
+            pos = self._start_position(self._figure, self._figure.get_turn())
+            self._figure.move(self._figure.get_turn(), pos[0], pos[1])
+            self._prompt = self._create_figure()
 
 
-
-    def _create_figute(self):
+    def _create_figure(self):
         _figure = random.choice(list(figures))
         turn = random.randint(1, 4)
         color = random.choice(list(colors))
