@@ -23,10 +23,21 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self._running = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self._running = False
-            if event.type == constant.PERIOD_EVENT:
+
+            elif event.type == constant.GAME_PERIOD_EVENT:
                 self._logic.period()
+            elif event.type == constant.BEFORE_SHIFT_EVENT:
+                self._logic.begin_shift()
+            elif event.type == constant.SHIFT_EVENT:
+                self._logic.shift()
+            elif event.type == pygame.KEYDOWN and (event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or
+                event.key == pygame.K_RIGHT or event.key == pygame.K_UP):
+                self._logic.key_down(event.key)
+            elif event.type == pygame.KEYUP and (event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or
+                event.key == pygame.K_RIGHT or event.key == pygame.K_UP):
+                self._logic.key_up(event.key)
 
     def loop(self):
         pass
