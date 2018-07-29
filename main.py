@@ -32,6 +32,7 @@ class Game:
                 self._logic.begin_shift()
             elif event.type == constant.SHIFT_EVENT:
                 self._logic.shift()
+
             elif event.type == pygame.KEYDOWN and (event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or
                 event.key == pygame.K_RIGHT or event.key == pygame.K_UP):
                 self._logic.key_down(event.key)
