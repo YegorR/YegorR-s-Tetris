@@ -9,6 +9,15 @@ figures = {'I', 'S', 'Z', 'O', 'L', 'J', 'T'}
 colors = {'red', 'green', 'blue', 'black', 'white'}
 
 
+def f(p):
+    for i in range(10):
+        for j in range(20):
+            if p[i][j] == True:
+                print(1, end=' ')
+            else:
+                print(0, end=' ')
+        print()
+
 class Logic:
 
     def __init__(self):
@@ -55,7 +64,8 @@ class Logic:
                 self._field[coord[0]][coord[1]] = True
             for block in self._figure.sprites():
                 block.remove(self._figure)
-                block.add(self._fallen)
+                self._fallen.add(block)
+            self.destroy_lines()
             self._figure = self._prompt
             pos = self._start_position(self._figure)
             if pos is None:
@@ -233,6 +243,22 @@ class Logic:
         self._figure = None
         pygame.event.post(pygame.event.Event(GAME_OVER_EVENT, dict()))
 
+    def destroy_lines(self):
+        i = 19
+        while i >= 0:
+            is_line = True
+            for j in range(10):
+                if not self._field[j][i]:
+                    is_line = False
+                    break
+            if not is_line:
+                i -= 1
+                continue
+            else:
+                for j in range(i, 0, -1):
+                    for k in range(10):
+                        self._field[k][j] = self._field[k][j-1]
+                self._fallen.destroy_line(i)
 
     def _create_figure(self):
         _figure = random.choice(list(figures))
@@ -278,3 +304,5 @@ class Logic:
         if self._right_pressed and not (self._down_pressed or self._left_pressed or self._up_pressed):
             return True
         return False
+
+
