@@ -3,7 +3,7 @@ import random
 import figure
 import pygame
 from constant import GAME_PERIOD, SHIFT_PERIOD, BEFORE_SHIFT_PERIOD
-from constant import GAME_PERIOD_EVENT, SHIFT_EVENT, BEFORE_SHIFT_EVENT
+from constant import GAME_PERIOD_EVENT, SHIFT_EVENT, BEFORE_SHIFT_EVENT, GAME_OVER_EVENT
 
 figures = {'I', 'S', 'Z', 'O', 'L', 'J', 'T'}
 colors = {'red', 'green', 'blue', 'black', 'white'}
@@ -28,7 +28,7 @@ class Logic:
     def start(self):
         self._prompt = self._create_figure()
         self._figure = self._create_figure()
-        pos = self._start_position(self._figure.get_figure(), self._figure.get_turn())
+        pos = self._start_position(self._figure)
         self._figure.move(self._figure.get_turn(), pos[0], pos[1])
 
     def render(self, display_surf):
@@ -40,6 +40,8 @@ class Logic:
             self._fallen.draw(display_surf)
 
     def period(self):
+        if self._figure is None:
+            return
         is_space = True
         for coord in self._figure.get_coord():
             if coord[1] == 19 or self._field[coord[0]][coord[1]+1]:
@@ -55,11 +57,16 @@ class Logic:
                 block.remove(self._figure)
                 block.add(self._fallen)
             self._figure = self._prompt
-            pos = self._start_position(self._figure.get_figure(), self._figure.get_turn())
+            pos = self._start_position(self._figure)
+            if pos is None:
+                self.game_over()
+                return
             self._figure.move(self._figure.get_turn(), pos[0], pos[1])
             self._prompt = self._create_figure()
 
     def key_down(self, key):
+        if self._figure is None:
+            return
         pygame.time.set_timer(BEFORE_SHIFT_EVENT, BEFORE_SHIFT_PERIOD)
         if key == pygame.K_LEFT:
             self._left_pressed = True
@@ -84,6 +91,8 @@ class Logic:
             self.turning()
 
     def key_up(self, key):
+        if self._figure is None:
+            return
         pygame.time.set_timer(BEFORE_SHIFT_EVENT, 0)
         pygame.time.set_timer(SHIFT_EVENT, 0)
         if key == pygame.K_LEFT:
@@ -103,7 +112,7 @@ class Logic:
         pygame.time.set_timer(SHIFT_EVENT, SHIFT_PERIOD)
 
     def shift(self):
-        if not self._is_only_one_key_pressed():
+        if not self._is_only_one_key_pressed() or self._figure is None:
             return
 
         if self._left_pressed:
@@ -125,6 +134,9 @@ class Logic:
             pygame.time.set_timer(GAME_PERIOD_EVENT, self._period)
 
     def turning(self):
+        if self._figure is None:
+            return
+
         _figure = self._figure.get_figure()
         _turn = self._figure.get_turn()
         _pos = self._figure.get_main_coord()
@@ -214,6 +226,13 @@ class Logic:
                     return
                 self._figure.move(0, a, b-1)
 
+    def game_over(self):
+        pygame.time.set_timer(GAME_PERIOD_EVENT, 0)
+        pygame.time.set_timer(SHIFT_EVENT, 0)
+        pygame.time.set_timer(BEFORE_SHIFT_EVENT, 0)
+        self._figure = None
+        pygame.event.post(pygame.event.Event(GAME_OVER_EVENT, dict()))
+
 
     def _create_figure(self):
         _figure = random.choice(list(figures))
@@ -221,20 +240,33 @@ class Logic:
         color = random.choice(list(colors))
         return figure.Figure(color, _figure, turn)
 
-    def _start_position(self, _figure, turn):
-        if _figure == "I" and turn % 2 == 1:
-            return random.randint(0, 6), 0
-            return 6, 0
-        elif ((_figure == "L" or _figure == "J") and (turn % 4 == 1 or turn % 4 == 3) or
-            (_figure == "S" or _figure == "Z") and turn % 2 == 0 or
-            _figure == "T" and (turn % 4 == 0 or turn % 4 == 2)):
-            return random.randint(0, 7), 0
-            return 7, 0
-        elif _figure == "I" and turn % 2 == 0:
-            return random.randint(0, 9), 0
-            return 9, 0
+    def _start_position(self, _figure):
+        _type = _figure.get_figure()
+        turn = _figure.get_turn()
+        if _type == "I" and turn % 2 == 1:
+            pos_list = [i for i in range(0, 6+1)]
+        elif ((_type == "L" or _type == "J") and (turn % 4 == 1 or turn % 4 == 3) or
+              (_type == "S" or _type == "Z") and turn % 2 == 0 or
+              _type == "T" and (turn % 4 == 0 or turn % 4 == 2)):
+            pos_list = [i for i in range(0, 7+1)]
+        elif _type == "I" and turn % 2 == 0:
+            pos_list = [i for i in range(0, 9+1)]
         else:
-            return random.randint(0, 8), 0
+            pos_list = [i for i in range(0, 8+1)]
+        figure_pos = _figure.get_coord()
+        while True:
+            start_pos = random.choice(pos_list)
+            is_empty = True
+            for i in figure_pos:
+                if self._field[i[0]+start_pos][i[1]]:
+                    pos_list.remove(start_pos)
+                    if not pos_list:
+                        return None
+                    is_empty = False
+                    break
+            if is_empty:
+                return start_pos, 0
+
 
     def _is_only_one_key_pressed(self):
         if self._up_pressed and not (self._down_pressed or self._left_pressed or self._right_pressed):

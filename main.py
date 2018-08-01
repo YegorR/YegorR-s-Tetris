@@ -32,6 +32,8 @@ class Game:
                 self._logic.begin_shift()
             elif event.type == constant.SHIFT_EVENT:
                 self._logic.shift()
+            elif event.type == constant.GAME_OVER_EVENT:
+                self.game_over()
 
             elif event.type == pygame.KEYDOWN and (event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or
                 event.key == pygame.K_RIGHT or event.key == pygame.K_UP):
@@ -59,6 +61,9 @@ class Game:
             self.render()
         self.destroy()
 
+    def game_over(self):
+        self._running = False
+        print("GAME OVER")
 
 if __name__ == "__main__":
     game = Game()
