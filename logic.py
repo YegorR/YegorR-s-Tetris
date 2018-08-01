@@ -125,7 +125,95 @@ class Logic:
             pygame.time.set_timer(GAME_PERIOD_EVENT, self._period)
 
     def turning(self):
-        pass
+        _figure = self._figure.get_figure()
+        _turn = self._figure.get_turn()
+        _pos = self._figure.get_main_coord()
+        a = _pos[0]
+        b = _pos[1]
+
+        if _figure == "O":
+            return
+        if _figure == "I":
+            if _turn % 2 == 0:
+                if a == 9 or a < 2 or self._field[a-2][b+1] or self._field[a-1][b+1] or self._field[a+1][b+1]:
+                    return
+                self._figure.move(1, a-2, b+1)
+            else:
+                if b == 0 or b > 17 or self._field[a+2][b-1] or self._field[a+2][b+1] or self._field[a+2][b+2]:
+                    return
+                self._figure.move(0, a+2, b-1)
+
+        if _figure == "T":
+            if _turn % 4 == 0:
+                if b > 17 or self._field[a+2][b+1] or self._field[a+2][b+2]:
+                    return
+                self._figure.move(1, a+1, b)
+            elif _turn % 4 == 1:
+                if a == 0 or self._field[a-1][b+2] or self._field[a][b+2]:
+                    return
+                self._figure.move(2, a-1, b+1)
+            elif _turn % 4 == 2:
+                if b == 0 or self._field[a][b] or self._field[a][b-1]:
+                    return
+                self._figure.move(3, a, b-1)
+            else:
+                if a > 7 or self._field[a+1][b] or self._field[a+2][b]:
+                    return
+                self._figure.move(0, a, b)
+
+        if _figure == "S":
+            if _turn % 2 == 0:
+                if b == 0 or self._field[a+1][b-1] or self._field[a+2][b+1]:
+                    return
+                self._figure.move(1, a+1, b-1)
+            else:
+                if a == 0 or self._field[a-1][b+2] or self._field[a][b+2]:
+                    return
+                self._figure.move(0, a-1, b+1)
+        if _figure == "Z":
+            if _turn % 2 == 0:
+                if b == 0 or self._field[a][b+1] or self._field[a+1][b-1]:
+                    return
+                self._figure.move(1, a, b-1)
+            else:
+                if a == 8 or self._field[a+1][b+2] or self._field[a+2][b+2]:
+                    return
+                self._figure.move(0, a, b+1)
+        if _figure == "J":
+            if _turn % 4 == 0:
+                if a == 8 or self._field[a][b+1] or self._field[a+2][b+2]:
+                    return
+                self._figure.move(1, a, b+1)
+            elif _turn % 4 == 1:
+                if b == 0 or self._field[a][b-1] or self._field[a+1][b-1]:
+                    return
+                self._figure.move(2, a, b-1)
+            elif _turn % 4 == 2:
+                if a == 8 or self._field[a+1][b+1] or self._field[a+2][b+1] or self._field[a+2][b+2]:
+                    return
+                self._figure.move(3, a, b+1)
+            else:
+                if b == 0 or self._field[a][b+1] or self._field[a+1][b+1] or self._field[a+1][b-1]:
+                    return
+                self._figure.move(0, a, b - 1)
+        if _figure == "L":
+            if _turn % 4 == 0:
+                if a == 8 or self._field[a+1][b+1] or self._field[a+2][b+1]:
+                    return
+                self._figure.move(1, a, b+1)
+            elif _turn % 4 == 1:
+                if b == 0 or self._field[a][b-1] or self._field[a+1][b-1] or self._field[a+1][b+1]:
+                    return
+                self._figure.move(2, a, b - 1)
+            elif _turn % 4 == 2:
+                if a == 8 or self._field[a][b+2] or self._field[a+2][b+1] or self._field[a+2][b+2]:
+                    return
+                self._figure.move(3, a, b+1)
+            else:
+                if b == 0 or self._field[a][b] or self._field[a][b-1]:
+                    return
+                self._figure.move(0, a, b-1)
+
 
     def _create_figure(self):
         _figure = random.choice(list(figures))
@@ -134,7 +222,6 @@ class Logic:
         return figure.Figure(color, _figure, turn)
 
     def _start_position(self, _figure, turn):
-        #print(_figure)
         if _figure == "I" and turn % 2 == 1:
             return random.randint(0, 6), 0
             return 6, 0

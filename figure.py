@@ -127,3 +127,4 @@ class Figure(BlockContainer):
         self._rerectering(turn, a, b)
         self._a = a
         self._b = b
+        self._turn = turn
