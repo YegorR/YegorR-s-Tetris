@@ -9,6 +9,7 @@ class Game:
         self._running = True
         self._background = None
         self._logic = None
+        self._font = None
 
     def init(self):
         pygame.init()
@@ -18,6 +19,8 @@ class Game:
         self._background = pygame.image.load(constant.FILE_BACKGROUND).convert()
         self._logic = logic.Logic()
         self._logic.start()
+
+        self._font = pygame.font.SysFont("Arial", 20)
 
     def event(self):
         for event in pygame.event.get():
@@ -48,6 +51,7 @@ class Game:
     def render(self):
         self._display_surf.blit(self._background, (0, 0))
         self._logic.render(self._display_surf)
+        self._display_surf.blit(self.render_score(), (220, 130))
         pygame.display.update()
 
     def destroy(self):
@@ -64,6 +68,10 @@ class Game:
     def game_over(self):
         self._running = False
         print("GAME OVER")
+
+    def render_score(self):
+        return self._font.render(str(self._logic.get_score()), 1, (200, 10, 10))
+
 
 if __name__ == "__main__":
     game = Game()

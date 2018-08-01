@@ -34,6 +34,8 @@ class Logic:
         self._down_pressed = False
         self._up_pressed = False
 
+        self._score = 0
+
     def start(self):
         self._prompt = self._create_figure()
         self._figure = self._create_figure()
@@ -255,10 +257,14 @@ class Logic:
                 i -= 1
                 continue
             else:
+                self._score += 1
                 for j in range(i, 0, -1):
                     for k in range(10):
                         self._field[k][j] = self._field[k][j-1]
                 self._fallen.destroy_line(i)
+
+    def get_score(self):
+        return self._score
 
     def _create_figure(self):
         _figure = random.choice(list(figures))
