@@ -12,11 +12,12 @@ colors = {'red', 'green', 'blue', 'black', 'white'}
 def f(p):
     for i in range(10):
         for j in range(20):
-            if p[i][j] == True:
+            if p[i][j]:
                 print(1, end=' ')
             else:
                 print(0, end=' ')
         print()
+
 
 class Logic:
 
@@ -29,10 +30,7 @@ class Logic:
         self._period = GAME_PERIOD[0]
         pygame.time.set_timer(GAME_PERIOD_EVENT, self._period)
 
-        self._left_pressed = False
-        self._right_pressed = False
-        self._down_pressed = False
-        self._up_pressed = False
+        self._active_pressed = None  # "L", "R", "U", "D"
 
         self._score = 0
 
@@ -80,26 +78,27 @@ class Logic:
         if self._figure is None:
             return
         pygame.time.set_timer(BEFORE_SHIFT_EVENT, BEFORE_SHIFT_PERIOD)
+        pygame.time.set_timer(SHIFT_EVENT, 0)
         if key == pygame.K_LEFT:
-            self._left_pressed = True
+            self._active_pressed = "L"
             for coord in self._figure.get_coord():
                 if coord[0] == 0 or self._field[coord[0]-1][coord[1]]:
                     return
             pos = self._figure.get_main_coord()
             self._figure.move(self._figure.get_turn(), pos[0]-1, pos[1])
         elif key == pygame.K_RIGHT:
-            self._right_pressed = True
+            self._active_pressed = "R"
             for coord in self._figure.get_coord():
                 if coord[0] == 9 or self._field[coord[0]+1][coord[1]]:
                     return
             pos = self._figure.get_main_coord()
             self._figure.move(self._figure.get_turn(), pos[0]+1, pos[1])
         elif key == pygame.K_DOWN:
-            self._down_pressed = True
+            self._active_pressed = "D"
             self.period()
             pygame.time.set_timer(GAME_PERIOD_EVENT, self._period)
         elif key == pygame.K_UP:
-            self._up_pressed = True
+            self._active_pressed = "U"
             self.turning()
 
     def key_up(self, key):
@@ -108,40 +107,41 @@ class Logic:
         pygame.time.set_timer(BEFORE_SHIFT_EVENT, 0)
         pygame.time.set_timer(SHIFT_EVENT, 0)
         if key == pygame.K_LEFT:
-            self._left_pressed = False
+            if self._active_pressed == "L":
+                self._active_pressed = None
         elif key == pygame.K_RIGHT:
-            self._right_pressed = False
+            if self._active_pressed == "R":
+                self._active_pressed = None
         elif key == pygame.K_DOWN:
-            self._down_pressed = False
+            if self._active_pressed == "D":
+                self._active_pressed = None
         elif key == pygame.K_UP:
-            self._up_pressed = False
+            if self._active_pressed == "U":
+                self._active_pressed = None
 
     def begin_shift(self):
-        if not self._is_only_one_key_pressed():
-            return
-
         pygame.time.set_timer(BEFORE_SHIFT_EVENT, 0)
         pygame.time.set_timer(SHIFT_EVENT, SHIFT_PERIOD)
 
     def shift(self):
-        if not self._is_only_one_key_pressed() or self._figure is None:
+        if self._figure is None:
             return
 
-        if self._left_pressed:
+        if self._active_pressed == "L":
             for coord in self._figure.get_coord():
                 if coord[0] == 0 or self._field[coord[0]-1][coord[1]]:
                     return
             pos = self._figure.get_main_coord()
             self._figure.move(self._figure.get_turn(), pos[0]-1, pos[1])
 
-        elif self._right_pressed:
+        elif self._active_pressed == "R":
             for coord in self._figure.get_coord():
                 if coord[0] == 9 or self._field[coord[0]+1][coord[1]]:
                     return
             pos = self._figure.get_main_coord()
             self._figure.move(self._figure.get_turn(), pos[0]+1, pos[1])
 
-        elif self._down_pressed:
+        elif self._active_pressed == "D":
             self.period()
             pygame.time.set_timer(GAME_PERIOD_EVENT, self._period)
 
@@ -258,6 +258,8 @@ class Logic:
                 continue
             else:
                 self._score += 1
+                if self._score % 10 == 0 and self._period != GAME_PERIOD[len(GAME_PERIOD)-1]:
+                    self._period = GAME_PERIOD[self._score // 10]
                 for j in range(i, 0, -1):
                     for k in range(10):
                         self._field[k][j] = self._field[k][j-1]
@@ -298,17 +300,3 @@ class Logic:
                     break
             if is_empty:
                 return start_pos, 0
-
-
-    def _is_only_one_key_pressed(self):
-        if self._up_pressed and not (self._down_pressed or self._left_pressed or self._right_pressed):
-            return True
-        if self._down_pressed and not (self._up_pressed or self._left_pressed or self._right_pressed):
-            return True
-        if self._left_pressed and not (self._down_pressed or self._up_pressed or self._right_pressed):
-            return True
-        if self._right_pressed and not (self._down_pressed or self._left_pressed or self._up_pressed):
-            return True
-        return False
-
-
