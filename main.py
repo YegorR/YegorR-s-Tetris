@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 import constant
 import logic
+import sound
 
 class Game:
     def __init__(self):
@@ -12,6 +13,7 @@ class Game:
         self._logic = None
         self._font = None
         self._end_font = None
+        self._sound = None
 
     def init(self):
         pygame.init()
@@ -23,6 +25,8 @@ class Game:
         self._logic = logic.Logic()
         self._logic.start()
 
+        self._sound = sound.Sound()
+        self._sound.play()
         self._font = pygame.font.SysFont("Arial", 20)
         self._end_font = pygame.font.SysFont("Arial", 30)
 
@@ -71,6 +75,7 @@ class Game:
         pygame.display.update()
 
     def destroy(self):
+        self._sound.stop()
         self._logic.destroy()
         pygame.quit()
 

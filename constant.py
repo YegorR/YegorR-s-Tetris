@@ -5,6 +5,7 @@ WINDOW_WIDTH = 300
 
 FILE_BACKGROUND = "img/background.png"
 FILE_BLOCK = "img/block.png"
+FILE_MUSIC = "sound/Tetris.ogg"
 
 WINDOW_NAME = "YegorR's Tetris"
 
