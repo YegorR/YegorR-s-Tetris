@@ -18,7 +18,7 @@ class Block(pygame.sprite.Sprite):
         elif color_dict[color] == color_dict['blue']:
             repl_color = (0, 0, 255, 255)
         elif color_dict[color] == color_dict['black']:
-            repl_color = (0, 0, 0, 255)
+            repl_color = (30, 25, 25, 255)
         elif color_dict[color] == color_dict['white']:
             repl_color = (255, 255, 255, 255)
         else:
