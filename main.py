@@ -36,14 +36,19 @@ class Game:
             elif self._except_new_game and event.type == pygame.KEYDOWN:
                 self.new_game()
 
-            elif event.type == constant.GAME_PERIOD_EVENT:
-                self._logic.period()
-            elif event.type == constant.BEFORE_SHIFT_EVENT:
-                self._logic.begin_shift()
-            elif event.type == constant.SHIFT_EVENT:
-                self._logic.shift()
-            elif event.type == constant.GAME_OVER_EVENT:
-                self.game_over()
+            elif event.type == constant.USER_EVENT:
+                if event.user_type == constant.GAME_PERIOD_EVENT:
+                    self._logic.period()
+                elif (event.user_type == constant.BEFORE_SHIFT_EVENT_DOWN or
+                      event.user_type == constant.BEFORE_SHIFT_EVENT_LEFT or
+                      event.user_type == constant.BEFORE_SHIFT_EVENT_RIGHT or
+                      event.user_type == constant.BEFORE_SHIFT_EVENT_UP):
+                    self._logic.begin_shift(event.user_type)
+                elif (event.user_type == constant.SHIFT_EVENT_DOWN or event.user_type == constant.SHIFT_EVENT_LEFT or
+                      event.user_type == constant.SHIFT_EVENT_RIGHT or event.user_type == constant.SHIFT_EVENT_UP):
+                    self._logic.shift(event.user_type)
+                elif event.user_type == constant.GAME_OVER_EVENT:
+                    self.game_over()
 
             elif event.type == pygame.KEYDOWN and (event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or
                 event.key == pygame.K_RIGHT or event.key == pygame.K_UP):
@@ -66,6 +71,7 @@ class Game:
         pygame.display.update()
 
     def destroy(self):
+        self._logic.destroy()
         pygame.quit()
 
     def execute(self):

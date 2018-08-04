@@ -2,8 +2,12 @@ import fallen
 import random
 import figure
 import pygame
+from timer import TimerMgr
 from constant import GAME_PERIOD, SHIFT_PERIOD, BEFORE_SHIFT_PERIOD
-from constant import GAME_PERIOD_EVENT, SHIFT_EVENT, BEFORE_SHIFT_EVENT, GAME_OVER_EVENT
+from constant import GAME_PERIOD_EVENT, GAME_OVER_EVENT
+from constant import SHIFT_EVENT_DOWN, SHIFT_EVENT_LEFT, SHIFT_EVENT_RIGHT, SHIFT_EVENT_UP
+from constant import BEFORE_SHIFT_EVENT_LEFT, BEFORE_SHIFT_EVENT_DOWN, BEFORE_SHIFT_EVENT_RIGHT, BEFORE_SHIFT_EVENT_UP
+from constant import USER_EVENT
 
 figures = {'I', 'S', 'Z', 'O', 'L', 'J', 'T'}
 colors = {'red', 'green', 'blue', 'black', 'white'}
@@ -26,11 +30,15 @@ class Logic:
         self._figure = None
         self._prompt = None
         self._fallen = fallen.Fallen()
+        self._timer_mgr = TimerMgr()
 
         self._period = GAME_PERIOD[0]
-        pygame.time.set_timer(GAME_PERIOD_EVENT, self._period)
+        self._timer_mgr.set_timer(GAME_PERIOD_EVENT, self._period)
 
-        self._active_pressed = None  # "L", "R", "U", "D"
+        self._left_pressed = False
+        self._right_pressed = False
+        self._up_pressed = False
+        self._down_pressed = False
 
         self._score = 0
 
@@ -77,73 +85,94 @@ class Logic:
     def key_down(self, key):
         if self._figure is None:
             return
-        pygame.time.set_timer(BEFORE_SHIFT_EVENT, BEFORE_SHIFT_PERIOD)
-        pygame.time.set_timer(SHIFT_EVENT, 0)
+
         if key == pygame.K_LEFT:
-            self._active_pressed = "L"
+            self._left_pressed = True
             for coord in self._figure.get_coord():
                 if coord[0] == 0 or self._field[coord[0]-1][coord[1]]:
                     return
             pos = self._figure.get_main_coord()
             self._figure.move(self._figure.get_turn(), pos[0]-1, pos[1])
+            self._timer_mgr.set_timer(BEFORE_SHIFT_EVENT_LEFT, BEFORE_SHIFT_PERIOD)
         elif key == pygame.K_RIGHT:
-            self._active_pressed = "R"
+            self._right_pressed = True
             for coord in self._figure.get_coord():
                 if coord[0] == 9 or self._field[coord[0]+1][coord[1]]:
                     return
             pos = self._figure.get_main_coord()
             self._figure.move(self._figure.get_turn(), pos[0]+1, pos[1])
+            self._timer_mgr.set_timer(BEFORE_SHIFT_EVENT_RIGHT, BEFORE_SHIFT_PERIOD)
         elif key == pygame.K_DOWN:
-            self._active_pressed = "D"
+            self._down_pressed = True
             self.period()
-            pygame.time.set_timer(GAME_PERIOD_EVENT, self._period)
+            self._timer_mgr.delete_timer(GAME_PERIOD_EVENT)
+            self._timer_mgr.set_timer(GAME_PERIOD_EVENT, self._period)
+            self._timer_mgr.set_timer(BEFORE_SHIFT_EVENT_DOWN, BEFORE_SHIFT_PERIOD)
         elif key == pygame.K_UP:
-            self._active_pressed = "U"
+            self._up_pressed = True
             self.turning()
+            self._timer_mgr.set_timer(BEFORE_SHIFT_EVENT_UP, BEFORE_SHIFT_PERIOD)
 
     def key_up(self, key):
         if self._figure is None:
             return
-        pygame.time.set_timer(BEFORE_SHIFT_EVENT, 0)
-        pygame.time.set_timer(SHIFT_EVENT, 0)
+
         if key == pygame.K_LEFT:
-            if self._active_pressed == "L":
-                self._active_pressed = None
+            self._left_pressed = False
+            self._timer_mgr.delete_timer(BEFORE_SHIFT_EVENT_LEFT)
+            self._timer_mgr.delete_timer(SHIFT_EVENT_LEFT)
         elif key == pygame.K_RIGHT:
-            if self._active_pressed == "R":
-                self._active_pressed = None
+            self._right_pressed = False
+            self._timer_mgr.delete_timer(BEFORE_SHIFT_EVENT_RIGHT)
+            self._timer_mgr.delete_timer(SHIFT_EVENT_RIGHT)
         elif key == pygame.K_DOWN:
-            if self._active_pressed == "D":
-                self._active_pressed = None
+            self._down_pressed = False
+            self._timer_mgr.delete_timer(BEFORE_SHIFT_EVENT_DOWN)
+            self._timer_mgr.delete_timer(SHIFT_EVENT_DOWN)
         elif key == pygame.K_UP:
-            if self._active_pressed == "U":
-                self._active_pressed = None
+            self._up_pressed = False
+            self._timer_mgr.delete_timer(BEFORE_SHIFT_EVENT_UP)
+            self._timer_mgr.delete_timer(SHIFT_EVENT_UP)
 
-    def begin_shift(self):
-        pygame.time.set_timer(BEFORE_SHIFT_EVENT, 0)
-        pygame.time.set_timer(SHIFT_EVENT, SHIFT_PERIOD)
+    def begin_shift(self, event_type):
+        if event_type == BEFORE_SHIFT_EVENT_LEFT:
+            self._timer_mgr.delete_timer(BEFORE_SHIFT_EVENT_LEFT)
+            self._timer_mgr.set_timer(SHIFT_EVENT_LEFT, SHIFT_PERIOD)
+        elif event_type == BEFORE_SHIFT_EVENT_RIGHT:
+            self._timer_mgr.delete_timer(BEFORE_SHIFT_EVENT_RIGHT)
+            self._timer_mgr.set_timer(SHIFT_EVENT_RIGHT, SHIFT_PERIOD)
+        elif event_type == BEFORE_SHIFT_EVENT_DOWN:
+            self._timer_mgr.delete_timer(BEFORE_SHIFT_EVENT_DOWN)
+            self._timer_mgr.set_timer(SHIFT_EVENT_DOWN, SHIFT_PERIOD)
+        elif event_type == BEFORE_SHIFT_EVENT_UP:
+            self._timer_mgr.delete_timer(BEFORE_SHIFT_EVENT_UP)
+            self._timer_mgr.set_timer(SHIFT_EVENT_UP, SHIFT_PERIOD)
 
-    def shift(self):
+    def shift(self, event_type):
         if self._figure is None:
             return
 
-        if self._active_pressed == "L":
+        if event_type == SHIFT_EVENT_LEFT:
             for coord in self._figure.get_coord():
                 if coord[0] == 0 or self._field[coord[0]-1][coord[1]]:
                     return
             pos = self._figure.get_main_coord()
             self._figure.move(self._figure.get_turn(), pos[0]-1, pos[1])
 
-        elif self._active_pressed == "R":
+        elif event_type == SHIFT_EVENT_RIGHT:
             for coord in self._figure.get_coord():
                 if coord[0] == 9 or self._field[coord[0]+1][coord[1]]:
                     return
             pos = self._figure.get_main_coord()
             self._figure.move(self._figure.get_turn(), pos[0]+1, pos[1])
 
-        elif self._active_pressed == "D":
+        elif event_type == SHIFT_EVENT_DOWN:
             self.period()
-            pygame.time.set_timer(GAME_PERIOD_EVENT, self._period)
+            self._timer_mgr.delete_timer(GAME_PERIOD_EVENT)
+            self._timer_mgr.set_timer(GAME_PERIOD_EVENT, self._period)
+
+        elif event_type == SHIFT_EVENT_UP:
+            self.turning()
 
     def turning(self):
         if self._figure is None:
@@ -239,11 +268,9 @@ class Logic:
                 self._figure.move(0, a, b-1)
 
     def game_over(self):
-        pygame.time.set_timer(GAME_PERIOD_EVENT, 0)
-        pygame.time.set_timer(SHIFT_EVENT, 0)
-        pygame.time.set_timer(BEFORE_SHIFT_EVENT, 0)
+        self._timer_mgr.delete_all_timers()
         self._figure = None
-        pygame.event.post(pygame.event.Event(GAME_OVER_EVENT, dict()))
+        pygame.event.post(pygame.event.Event(USER_EVENT, {'user_type': GAME_OVER_EVENT}))
 
     def destroy_lines(self):
         i = 19
@@ -267,6 +294,9 @@ class Logic:
 
     def get_score(self):
         return self._score
+
+    def destroy(self):
+        self._timer_mgr.delete_all_timers()
 
     def _create_figure(self):
         _figure = random.choice(list(figures))
